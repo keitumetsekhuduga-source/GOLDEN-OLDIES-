@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#b8860b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Golden Oldies</title>
+<link rel="icon" href="https://i.imgur.com/3180402951714343.png">
+<link rel="apple-touch-icon" href="https://i.imgur.com/3180402951714343.png">
+<link rel="manifest" href="data:application/json,{%22name%22:%22Golden%20Oldies%22,%22short_name%22:%22Oldies%22,%22start_url%22:%22.%22,%22display%22:%22standalone%22,%22background_color%22:%22%231a1a1a%22,%22theme_color%22:%22%23b8860b%22,%22icons%22:[{%22src%22:%22https://i.imgur.com/3180402951714343.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22,%22purpose%22:%22any%20maskable%22}]}">
+<style>
+:root{--bg:#1a1a1a;--card:#2a2a2a;--text:#fff;--text2:#bbb;--accent:#b8860b;--header:#b8860b;--btn:#333;--player:#111}
+body.light{--bg:#f5f5f5;--card:#fff;--text:#111;--text2:#555;--accent:#b8860b;--header:#b8860b;--btn:#e0e0e0;--player:#fff}
+body{font-family:system-ui;margin:0;background:var(--bg);color:var(--text);padding-bottom:420px;transition:background 0.3s}
+.header{background:var(--header);padding:12px 16px;text-align:center;font-size:20px;font-weight:bold;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.header-title{flex:1;text-align:center}
+.header-btns{display:flex;gap:8px}
+.icon-btn{background:rgba(0,0,0,0.2);border:none;color:#fff;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:16px;position:relative}
+.badge{position:absolute;top:-4px;right:-4px;background:#ff4444;color:#fff;font-size:10px;padding:2px 5px;border-radius:10px;font-weight:bold}
+.settings-menu{position:absolute;top:60px;right:12px;background:var(--card);border-radius:8px;padding:8px;display:none;z-index:30;box-shadow:0 4px 12px rgba(0,0,0,0.3);min-width:200px}
+.settings-menu button{display:block;width:100%;background:var(--btn);border:none;color:var(--text);padding:10px;text-align:left;border-radius:6px;margin:4px 0;cursor:pointer;font-size:14px}
+.search{padding:12px}
+.search input{width:100%;padding:10px;border-radius:8px;border:none;background:var(--btn);color:var(--text);font-size:16px}
+.filters{display:flex;gap:8px;padding:0 12px 12px;overflow-x:auto}
+.filter-btn{background:var(--btn);border:none;color:var(--text);padding:8px 12px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:var(--accent);color:#fff}
+.song-list{padding:0 12px}
+.song{background:var(--card);margin-bottom:12px;padding:12px;border-radius:8px;position:relative;box-shadow:0 2px 4px rgba(0,0,0,0.1);display:flex;gap:12px}
+.song.playing{border:2px solid var(--accent)}
+.song-art{width:60px;height:60px;border-radius:6px;object-fit:cover;background:var(--btn);flex-shrink:0}
+.song-content{flex:1;min-width:0}
+.song-main{cursor:pointer}
+.song-title{font-size:16px;font-weight:bold;padding-right:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-artist{color:var(--text2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.song-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px}
+.action-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:2px}
+.offline-badge{position:absolute;bottom:12px;right:12px;font-size:10px;background:#00aa00;color:#fff;padding:2px 6px;border-radius:4px}
+.player{position:fixed;bottom:0;left:0;right:0;background:var(--player);padding:16px;display:none;max-height:420px;overflow-y:auto;border-top:1px solid var(--btn);z-index:15}
+.visualizer{width:100%;height:60px;background:var(--bg);border-radius:6px;margin:8px 0}
+.player-top{display:flex;gap:12px;margin-bottom:8px}
+.player-art{width:80px;height:80px;border-radius:8px;object-fit:cover;background:var(--btn);flex-shrink:0}
+.player-info{flex:1;min-width:0}
+.player-title{font-size:16px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player-subtitle{font-size:13px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progress-wrap{display:flex;align-items:center;gap:8px;margin:8px 0}
+.progress-time{font-size:12px;color:var(--text2);min-width:40px}
+.progress-bar{flex:1;height:4px;background:var(--btn);border-radius:2px;cursor:pointer;position:relative}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;width:0%}
+.player-controls{display:flex;gap:6px;margin:8px 0;flex-wrap:wrap;align-items:center}
+.player-controls button{background:var(--btn);border:none;color:var(--text);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px}
+.player-controls select{background:var(--btn);border:none;color:var(--text);padding:6px;border-radius:6px;font-size:13px}
+.player-controls.active{background:var(--accent);color:#fff}
+.queue-list{background:var(--btn);padding:8px;border-radius:6px;margin-top:8px;max-height:120px;overflow-y:auto}
+.queue-item{display:flex;justify-content:space-between;align-items:center;padding:6px;font-size:13px;border-bottom:1px solid var(--bg)}
+.queue-item:last-child{border-bottom:none}
+.queue-item-title{flex:1;padding-right:8px}
+.queue-remove{background:none;border:none;color:#ff4444;cursor:pointer;font-size:16px}
+.lyrics{font-size:14px;color:var(--text2);margin-top:12px;white-space:pre-wrap;max-height:80px;overflow-y:auto}
+.bio{font-size:12px;color:var(--text2);margin-top:8px;font-style:italic}
+audio,iframe{width:100%;margin-top:8px;border-radius:4px}
+.close{position:absolute;top:12px;right:12px;background:var(--btn);border:none;color:var(--text);padding:4px 12px;border-radius:4px}
+.now-playing{color:var(--accent);font-size:12px;margin-top:4px}
+#fileInput{display:none}
+.volume-wrap{display:flex;align-items:center;gap:6px}
+.volume-slider{width:60px}
+.offline-status{font-size:11px;color:#00aa00;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-btns">
+    <button class="icon-btn" onclick="toggleTheme()" id="themeBtn">☀️</button>
+  </div>
+  <div class="header-title">🎶 Golden Oldies</div>
+  <div class="header-btns">
+    <button class="icon-btn" onclick="showQueue()" id="queueBtn">📋<span class="badge" id="queueBadge" style="display:none">0</span></button>
+    <button class="icon-btn" onclick="shufflePlay()">🔀</button>
+    <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
+  </div>
+</div>
+<div class="settings-menu" id="settingsMenu">
+  <button onclick="exportFavorites()">📤 Export All Data</button>
+  <button onclick="document.getElementById('fileInput').click()">📥 Import Data</button>
+  <button onclick="clearHistory()">🗑️ Clear History</button>
+  <button onclick="clearQueue()">🗑️ Clear Queue</button>
+  <button onclick="clearDownloads()">🗑️ Clear Downloads</button>
+</div>
+<input type="file" id="fileInput" accept=".json" onchange="importFavorites(event)">
+<div class="search">
+  <input type="text" id="searchBox" placeholder="Search song or artist..." oninput="renderSongs()">
+</div>
+<div class="filters" id="filters"></div>
+<div class="song-list" id="songList"></div>
+<div class="player" id="player">
+  <button class="close" onclick="closePlayer()">Close</button>
+  <div class="player-top">
+    <img class="player-art" id="playerArt" src="" alt="">
+    <div class="player-info">
+      <div class="player-title" id="playerTitle"></div>
+      <div class="player-subtitle" id="playerSubtitle"></div>
+      <div class="now-playing" id="nowPlaying"></div>
+      <div class="offline-status" id="offlineStatus"></div>
+    </div>
+  </div>
+  <canvas class="visualizer" id="visualizer"></canvas>
+  <div class="progress-wrap">
+    <span class="progress-time" id="currentTime">0:00</span>
+    <div class="progress-bar" id="progressBar" onclick="seek(event)">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <span class="progress-time" id="duration">0:00</span>
+  </div>
+  <div class="player-controls">
+    <button onclick="prevTrack()">⏮</button>
+    <button onclick="togglePlay()" id="playBtn">▶️</button>
+    <button onclick="nextTrack()">⏭</button>
+    <button onclick="toggleLoop()" id="loopBtn">🔁</button>
+    <button onclick="downloadCurrent()" id="downloadBtn" title="Download for Offline">⬇️</button>
+    <select id="eqSelect" onchange="changeEQ()" title="EQ">
+      <option value="flat">Flat</option>
+      <option value="bass">Bass Boost</option>
+      <option value="treble">Treble</option>
+      <option value="vocal">Vocal</option>
+      <option value="rock">Rock</option>
+      <option value="jazz">Jazz</option>
+    </select>
+    <select id="speedSelect" onchange="changeSpeed()" title="Speed">
+      <option value="0.5">0.5x</option>
+      <option value="0.75">0.75x</option>
+      <option value="1" selected>1x</option>
+      <option value="1.25">1.25x</option>
+      <option value="1.5">1.5x</option>
+      <option value="2">2x</option>
+    </select>
+    <select id="sleepTimer" onchange="setSleepTimer()" title="Sleep Timer">
+      <option value="0" selected>Timer Off</option>
+      <option value="5">5m</option>
+      <option value="15">15m</option>
+      <option value="30">30m</option>
+      <option value="60">60m</option>
+    </select>
+    <div class="volume-wrap">
+      <span>🔊</span>
+      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="100" oninput="changeVolume()">
+    </div>
+  </div>
+  <div id="mediaContainer"></div>
+  <div id="queueContainer"></div>
+  <div class="lyrics" id="lyrics"></div>
+  <div class="bio" id="bio"></div>
+</div>
+<script>
+const songs=[{id:1,title:"Tshego Ya Pelo",artist:"Socca Moruakgomo",year:1997,decade:"1990s",audio:"",youtube:"https://youtube.com/watch?v=example1",art:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300",lyrics:"Tshego ya pelo yame, ke go rata...",category:"Setswana Traditional",bio:"Socca Moruakgomo is a Botswana folk legend. Known for traditional Setswana songs that shaped weddings and celebrations in the 90s."},{id:2,title:"Pata Pata",artist:"Miriam Makeba",year:1967,decade:"1960s",audio:"",youtube:"https://youtube.com/watch?v=example3",art:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",lyrics:"Saguquka sathi bega nantsi pata pata...",category:"Afro Pop",bio:"Miriam Makeba, “Mama Africa”, was a South African singer and civil rights activist exiled for fighting apartheid."},{id:3,title:"Stimela",artist:"Hugh Masekela",year:1974,decade:"1970s",audio:"",youtube:"https://youtube.com/watch?v=example4",art:"https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300",lyrics:"There is a train that comes from Namibia...",category:"Jazz",bio:"Hugh Masekela was a SA jazz trumpeter. Stimela protests migrant labour conditions under apartheid."},{id:4,title:"Nkalakatha",artist:"Mandoza",year:2000,decade:"2000s",audio:"",youtube:"https://youtube.com/watch?v=example5",art:"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300",lyrics:"Nkalakatha, hola 7...",category:"Kwaito",bio:"Mandoza was a Kwaito icon from Soweto. Nkalakatha became a national anthem in SA. Passed in 2016."},{id:5,title:"Meadowlands",artist:"Nancy Jacobs & Her Sisters",year:1956,decade:"1950s",audio:"",youtube:"https://youtube.com/watch?v=example6",art:"https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=300",lyrics:"We will move to Meadowlands...",category:"Mbaqanga",bio:"The song protests forced removals to Meadowlands during apartheid. Became a resistance anthem."},{id:6,title:"Love Me or Leave Me",artist:"Brenda Fassie",year:1987,decade:"1980s",audio:"",youtube:"https://youtube.com/watch?v=example9",art:"https://images.unsplash.com/photo-1506157786151-b8491531f063?w=300",lyrics:"Love me or leave me and let me be lonely...",category:"Afro Pop",bio:"Brenda Fassie, “The Madonna of the Townships”, was SA’s biggest pop star in the 80s and 90s."},{id:7,title:"Tsa Manyalo",artist:"Culture Spears",year:2009,decade:"2000s",audio:"",youtube:"https://youtube.com/watch?v=example8",art:"https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=300",lyrics:"Tsa manyalo di monate...",category:"Setswana Disco",bio:"Culture Spears modernized Setswana traditional music. Biggest wedding song group in Botswana."},{id:8,title:"The Click Song",artist:"Miriam Makeba",year:1960,decade:"1960s",audio:"",youtube:"https://youtube.com/watch?v=example14",art:"https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300",lyrics:"Igqirha lendlela nguqo ngqothwane...",category:"Xhosa Traditional",bio:"Makeba made Xhosa click sounds famous worldwide. The song is about a traditional healer and a beetle."}];
+let currentFilter="All";let favorites=JSON.parse(localStorage.getItem("favorites")||"[]");let history=JSON.parse(localStorage.getItem("history")||"[]");let queue=JSON.parse(localStorage.getItem("queue")||"[]");let downloads=JSON.parse(localStorage.getItem("downloads")||"[]");let shuffleQueue=[];let shuffleIndex=-1;let isShuffling=false;let currentSongId=null;let isLooping=false;let sleepTimerId=null;let currentAudio=null;let audioContext,source,analyser,filters={};let animationId;
+const eqPresets={flat:[0,0,0],bass:[6,4,1,-1,-2],treble:[-2,-1,1,4,6],vocal:[-2,2,4,2,-1],rock:[4,2,-1,2,4],jazz:[3,1,0,2,3]};
+function initAudioContext(){if(!audioContext){audioContext=new(window.AudioContext||window.webkitAudioContext)();analyser=audioContext.createAnalyser();analyser.fftSize=256;const freqs=[60,230,910,3600,14000];filters=freqs.map(f=>{const filter=audioContext.createBiquadFilter();filter.type="peaking";filter.frequency.value=f;filter.Q.value=1;filter.gain.value=0;return filter});filters.reduce((prev,curr)=>{prev.connect(curr);return curr})}}
+function drawVisualizer(){if(!analyser)return;const canvas=document.getElementById("visualizer");const ctx=canvas.getContext("2d");canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;const bufferLength=analyser.frequencyBinCount;const dataArray=new Uint8Array(bufferLength);function draw(){animationId=requestAnimationFrame(draw);analyser.getByteFrequencyData(dataArray);ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--player');ctx.fillRect(0,0,canvas.width,canvas.height);const barWidth=(canvas.width/bufferLength)*2.5;let x=0;const accent=getComputedStyle(document.body).getPropertyValue('--accent');for(let i=0;i<bufferLength;i++){const barHeight=(dataArray[i]/255)*canvas.height;ctx.fillStyle=accent;ctx.fillRect(x,canvas.height-barHeight,barWidth,barHeight);x+=barWidth+1}}draw()}
+async function downloadCurrent(){if(!currentAudio||!currentAudio.src){alert("Only MP3 files can be downloaded. YouTube videos stream only.");return}const song=songs.find(s=>s.id===currentSongId);if(downloads.includes(song.id)){alert("Already downloaded!");return}try{document.getElementById("downloadBtn").textContent="⏳";const response=await fetch(currentAudio.src);const blob=await response.blob();const cache=await caches.open('golden-oldies-v1');await cache.put(currentAudio.src,new Response(blob));downloads.push(song.id);localStorage.setItem("downloads",JSON.stringify(downloads));document.getElementById("downloadBtn").textContent="✅";document.getElementById("offlineStatus").textContent="Available offline";renderSongs();setTimeout(()=>{document.getElementById("downloadBtn").textContent="⬇️"},2000)}catch(err){alert("Download failed. Check your connection.");document.getElementById("downloadBtn").textContent="⬇️"}}
+async function clearDownloads(){if(confirm("Delete all downloaded songs?")){const cache=await caches.open('golden-oldies-v1');const keys=await cache.keys();await Promise.all(keys.map(k=>cache.delete(k)));downloads=[];localStorage.setItem("downloads",JSON.stringify(downloads));renderSongs();toggleSettings()}}
+function initTheme(){const theme=localStorage.getItem("theme")||"dark";if(theme==="light")document.body.classList.add("light");document.getElementById("themeBtn").textContent=theme==="light"?"🌙":"☀️"}
+function toggleTheme(){document.body.classList.toggle("light");const isLight=document.body.classList.contains("light");localStorage.setItem("theme",isLight?"light":"dark");document.getElementById("themeBtn").textContent=isLight?"🌙":"☀️"}
+function toggleSettings(){const menu=document.getElementById("settingsMenu");menu.style.display=menu.style.display==="block"?"none":"block"}
+document.addEventListener("click",(e)=>{if(!e.target.closest(".header-btns")&&!e.target.closest(".settings-menu")){document.getElementById("settingsMenu").style.display="none"}});
+function exportFavorites(){const data=JSON.stringify({favorites,history,queue,downloads,exportDate:new Date().toISOString()},null,2);const blob=new Blob([data],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="golden-oldies-data.json";a.click();URL.revokeObjectURL(url);toggleSettings()}
+function importFavorites(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=(e)=>{try{const data=JSON.parse(e.target.result);if(Array.isArray(data.favorites))favorites=[...new Set([...favorites,...data.favorites])];if(Array.isArray(data.history))history=[...new Set([...data.history,...history])].slice(0,20);if(Array.isArray(data.queue))queue=data.queue;if(Array.isArray(data.downloads))downloads=data.downloads;saveData();updateQueueBadge();renderSongs();alert("Data imported successfully!")}catch(err){alert("Invalid file format")}};reader.readAsText(file);toggleSettings();event.target.value=""}
+function saveData(){localStorage.setItem("favorites",JSON.stringify(favorites));localStorage.setItem("history",JSON.stringify(history));localStorage.setItem("queue",JSON.stringify(queue));localStorage.setItem("downloads",JSON.stringify(downloads))}
+function clearHistory(){if(confirm("Clear all recently played songs?")){history=[];saveData();renderSongs();toggleSettings()}}
+function clearQueue(){if(confirm("Clear the entire queue?")){queue=[];saveData();updateQueueBadge();updateQueueDisplay();toggleSettings()}}
+function addToQueue(id,event){event.stopPropagation();if(!queue.includes(id)){queue.push(id);saveData();updateQueueBadge();updateQueueDisplay()}}
+function removeFromQueue(id){queue=queue.filter(q=>q!==id);saveData();updateQueueBadge();updateQueueDisplay()}
+function updateQueueBadge(){const badge=document.getElementById("queueBadge");if(queue.length>0){badge.textContent=queue.length;badge.style.display="block"}else{badge.style.display="none"}}
+function showQueue(){setFilter("Queue")}
+function playNextInQueue(){if(queue.length===0)return false;const nextId=queue.shift();saveData();updateQueueBadge();playSong(nextId);return true}
+function addToHistory(id){history=history.filter(h=>h!==id);history.unshift(id);if(history.length>20)history=history.slice(0,20);saveData()}
+function toggleFavorite(id,event){event.stopPropagation();const index=favorites.indexOf(id);if(index>-1)favorites.splice(index,1);else favorites.push(id);saveData();renderSongs()}
+function shareSong(id,event){event.stopPropagation();const s=songs.find(song=>song.id===id);const appUrl=window.location.href.split('?')[0];const text=`🎶 Listen to "${s.title}" by ${s.artist} on Golden Oldies!\n\n${appUrl}?song=${id}`;const whatsappUrl=`https://wa.me/?text=${encodeURIComponent(text)}`;window.open(whatsappUrl,'_blank')}
+function renderFilters(){const decades=["All","Favorites","Recent","Queue","Downloaded",...new Set(songs.map(s=>s.decade))].sort();document.getElementById("filters").innerHTML=decades.map(d=>`<button class="filter-btn ${d===currentFilter?'active':''}" onclick="setFilter('${d}')">${d}</button>`).join("")}
+function setFilter(decade){currentFilter=decade;renderSongs();renderFilters()}
+function renderSongs(){const searchTerm=document.getElementById("searchBox").value.toLowerCase();let filtered=songs;if(currentFilter==="Favorites"){filtered=songs.filter(s=>favorites.includes(s.id))}else if(currentFilter==="Recent"){filtered=history.map(id=>songs.find(s=>s.id===id)).filter(Boolean)}else if(currentFilter==="Queue"){filtered=queue.map(id=>songs.find(s=>s.id===id)).filter(Boolean)}else if(currentFilter==="Downloaded"){filtered=songs.filter(s=>downloads.includes(s.id))}else if(currentFilter!=="All"){filtered=songs.filter(s=>s.decade===currentFilter)}if(searchTerm){filtered=filtered.filter(s=>s.title.toLowerCase().includes(searchTerm)||s.artist.toLowerCase().includes(searchTerm))}document.getElementById("songList").innerHTML=filtered.map(s=>`<div class="song ${currentSongId===s.id?'playing':''}"><img class="song-art" src="${s.art}" alt="${s.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22%3E%3Crect fill=%22%23333%22 width=%2260%22 height=%2260%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22%23b8860b%22 text-anchor=%22middle%22 dy=%22.3em%22 font-size=%2224%22%3E🎵%3C/text%3E%3C/svg%3E'"><div class="song-content"><div class="song-main" onclick="playSong(${s.id})"><div class="song-title">${s.title}</div><div class="song-artist">${s.artist} • ${s.year}</div></div>${downloads.includes(s.id)?'<div class="offline-badge">OFFLINE</div>':''}<div class="song-actions"><button class="action-btn" onclick="addToQueue(${s.id},event)" title="Add to Queue">➕</button><button class="action-btn" onclick="shareSong(${s.id},event)" title="Share">📤</button><button class="action-btn" onclick="toggleFavorite(${s.id},event)" title="Favorite">${favorites.includes(s.id)?'❤️':'🤍'}</button></div></div></div>`).join("")||`<p style="text-align:center;color:var(--text2);padding:40px">No songs found</p>`}
+function playSong(id,fromShuffle=false){if(!fromShuffle){isShuffling=false;shuffleQueue=[];shuffleIndex=-1}currentSongId=id;addToHistory(id);const s=songs.find(song=>song.id===id);document.getElementById("playerTitle").textContent=s.title;document.getElementById("playerSubtitle").textContent=`${s.artist} • ${s.year}`;document.getElementById("playerArt").src=s.art;document.getElementById("lyrics").textContent=s.lyrics;document.getElementById("bio").textContent=s.bio;if(isShuffling){document.getElementById("nowPlaying").textContent=`Shuffle ${shuffleIndex+1} of ${shuffleQueue.length}`}else if(queue.length>0){document.getElementById("nowPlaying").textContent=`Queue: ${queue.length} next`}else{document.getElementById("nowPlaying").textContent=""}document.getElementById("offlineStatus").textContent=downloads.includes(s.id)?"Available offline":"";document.getElementById("downloadBtn").textContent=downloads.includes(s.id)?"✅":"⬇️";updateQueueDisplay();let mediaHTML="";if(s.audio){mediaHTML=`<audio id="audioPlayer" src="${s.audio}" crossorigin="anonymous"></audio>`;document.getElementById("mediaContainer").innerHTML=mediaHTML;setupAudioPlayer()}else if(s.youtube){const videoId=s.youtube.split("v=")[1]?.split("&")[0];mediaHTML=`<iframe height="200" src="https://www.youtube.com/embed/${videoId}?enablejsapi=1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;document.getElementById("mediaContainer").innerHTML=mediaHTML}else{mediaHTML=`<p style="color:var(--text2)">No audio available yet</p>`;document.getElementById("mediaContainer").innerHTML=mediaHTML}document.getElementById("player").style.display="block";renderSongs()}
+function setupAudioPlayer(){currentAudio=document.getElementById("audioPlayer");if(!currentAudio)return;initAudioContext();if(audioContext&&source)source.disconnect();source=audioContext.createMediaElementSource(currentAudio);source.connect(filters[0]);filters[filters.length-1].connect(analyser);analyser.connect(audioContext.destination);currentAudio.volume=document.getElementById("volumeSlider").value/100;currentAudio.playbackRate=parseFloat(document.getElementById("speedSelect").value);changeEQ();currentAudio.onloadedmetadata=()=>{document.getElementById("duration").textContent=formatTime(currentAudio.duration);currentAudio.play();document.getElementById("playBtn").textContent="⏸️";drawVisualizer()};currentAudio.ontimeupdate=()=>{const percent=(currentAudio.currentTime/currentAudio.duration)*100;document.getElementById("progressFill").style.width=percent+"%";document.getElementById("currentTime").textContent=formatTime(currentAudio.currentTime)};currentAudio.onended=()=>{if(isLooping){currentAudio.currentTime=0;currentAudio.play()}else if(isShuffling){nextShuffle()}else if(queue.length>0){playNextInQueue()}else{document.getElementById("playBtn").textContent="▶️";cancelAnimationFrame(animationId)}};currentAudio.onplay=()=>{document.getElementById("playBtn").textContent="⏸️";if(audioContext.state==='suspended')audioContext.resume()};currentAudio.onpause=()=>document.getElementById("playBtn").textContent="▶️"}
+function togglePlay(){if(!currentAudio)return;if(audioContext.state==='suspended')audioContext.resume();if(currentAudio.paused)currentAudio.play();else currentAudio.pause()}
+function prevTrack(){if(history.length>1){playSong(history[1])}}
+function nextTrack(){if(isShuffling)nextShuffle();else if(queue.length>0)playNextInQueue();else if(history.length>0){const currentIndex=history.indexOf(currentSongId);if(currentIndex<history.length-1)playSong(history[currentIndex+1])}}
+function seek(event){if(!currentAudio)return;const rect=event.currentTarget.getBoundingClientRect();const percent=(event.clientX-rect.left)/rect.width;currentAudio.currentTime=percent*currentAudio.duration}
+function changeVolume(){if(currentAudio)currentAudio.volume=document.getElementById("volumeSlider").value/100}
+function changeSpeed(){if(currentAudio)currentAudio.playbackRate=parseFloat(document.getElementById("speedSelect").value)}
+function changeEQ(){const preset=document.getElementById("eqSelect").value;const gains=eqPresets[preset];if(filters.length){gains.forEach((gain,i)=>{if(filters[i])filters[i].gain.value=gain})}}
+function toggleLoop(){isLooping=!isLooping;document.getElementById("loopBtn").classList.toggle("active",isLooping)}
+function setSleepTimer(){clearTimeout(sleepTimerId);const mins=parseInt(document.getElementById("sleepTimer").value);if(mins>0){sleepTimerId=setTimeout(()=>{if(currentAudio)currentAudio.pause();alert("Sleep timer: Music stopped")},mins*60000)}}
+function formatTime(s){if(isNaN(s))return"0:00";const m=Math.floor(s/60);const sec=Math.floor(s%60);return`${m}:${sec<10?'0':''}${sec}`}
+function shufflePlay(){shuffleQueue=[...songs].sort(()=>Math.random()-0.5);shuffleIndex=0;isShuffling=true;playSong(shuffleQueue[0].id,true)}
+function nextShuffle(){if(!isShuffling)return;shuffleIndex++;if(shuffleIndex>=shuffleQueue.length){shuffleIndex=0}playSong(shuffleQueue[shuffleIndex].id,true)}
+function closePlayer(){document.getElementById("player").style.display="none";if(currentAudio){currentAudio.pause()}cancelAnimationFrame(animationId);currentSongId=null;renderSongs()}
+function updateQueueDisplay(){const container=document.getElementById("queueContainer");if(queue.length===0){container.innerHTML="";return}const queueSongs=queue.map(id=>songs.find(s=>s.id===id)).filter(Boolean);container.innerHTML=`<div style="font-size:14px;font-weight:bold;margin:12px 0 6px">Up Next</div><div class="queue-list">${queueSongs.map(s=>`<div class="queue-item"><span class="queue-item-title">${s.title} - ${s.artist}</span><button class="queue-remove" onclick="removeFromQueue(${s.id})">×</button></div>`).join("")}</div>`}
+function init(){initTheme();renderFilters();renderSongs();updateQueueBadge();const urlParams=new URLSearchParams(window.location.search);const songId=urlParams.get('song');if(songId)playSong(parseInt(songId))}
+init();
+</script>
+</body>
+        </html>
